@@ -1,8 +1,8 @@
 --[[
 
-	Record - v1.0.0 public domain immutable records implementaion for Lua. All
+	record - v1.0.1 public domain immutable records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents. Somehow
-	this is similar to FB Immutable Record, but far more simple.
+	this is similar to FB Immutable record, but far more simple.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
 	url: github.com/iskolbin/lrecord
@@ -19,11 +19,11 @@
 
 --]]
 
-local Record = {}
+local record = {}
 
 local error, pairs, select = _G.error, _G.pairs, _G.select
 
-function Record.make( default, partial )
+function record.make( default, partial )
 	local obj = {}
 	for k, v in pairs( default ) do
 		obj[k] = v
@@ -39,7 +39,7 @@ function Record.make( default, partial )
 	return obj
 end
 
-function Record.copy( self )
+function record.copy( self )
 	local obj = {}
 	for k, v in pairs( self ) do
 		obj[k] = v
@@ -47,11 +47,11 @@ function Record.copy( self )
 	return obj
 end
 
-local copy = Record.copy
+local copy = record.copy
 
-Record.error = error
+record.error = error
 
-function Record.set( self, ... )
+function record.set( self, ... )
 	local n = select( '#', ... )
 	if n > 1 then
 		local obj = {}
@@ -62,7 +62,7 @@ function Record.set( self, ... )
 		end
 		local k, v = select(n-1,...)
 		if currentSelf[k] == nil then
-			Record.error(( 'Record doesn\'t have field %q'):format( k ))
+			record.error(( 'Record doesn\'t have field %q'):format( k ))
 		end
 		currentObj[k] = v
 		return obj
@@ -71,11 +71,11 @@ function Record.set( self, ... )
 	end
 end
 
-function Record.set1( self, k, v )
+function record.set1( self, k, v )
 	if self[k] ~= v then
 		local obj = copy( self )
 		if self[k] == nil then
-			Record.error(( 'Record doesn\'t have field %q'):format( k ))
+			record.error(( 'Record doesn\'t have field %q'):format( k ))
 		end
 		obj[k] = v
 		return obj
@@ -84,12 +84,12 @@ function Record.set1( self, k, v )
 	end
 end
 
-function Record.set2( self, k1, k2, v )
+function record.set2( self, k1, k2, v )
 	if self[k1][k2] ~= v then
 		local obj = copy( self )
 		obj[k1] = copy( self[k1] )
 		if self[k1][k2] == nil then
-			Record.error(( 'Record doesn\'t have field %q.%q'):format( k1, k2 ))
+			record.error(( 'Record doesn\'t have field %q.%q'):format( k1, k2 ))
 		end
 		obj[k1][k2] = v
 		return obj
@@ -98,13 +98,13 @@ function Record.set2( self, k1, k2, v )
 	end
 end
 
-function Record.set3( self, k1, k2, k3, v )
+function record.set3( self, k1, k2, k3, v )
 	if self[k1][k2][k3] ~= v then
 		local obj = copy( self )
 		obj[k1] = copy( self[k1] )
 		obj[k1][k2] = copy( self[k1][k2] )
 		if self[k1][k2][k3] == nil then
-			Record.error(( 'Record doesn\'t have field %q.%q.%q'):format( k1, k2, k3 ))
+			record.error(( 'Record doesn\'t have field %q.%q.%q'):format( k1, k2, k3 ))
 		end
 		obj[k1][k2][k3] = v
 		return obj
@@ -113,7 +113,7 @@ function Record.set3( self, k1, k2, k3, v )
 	end
 end
 
-function Record.update( self, ... )
+function record.update( self, ... )
 	local n = select( '#', ... )
 	if n > 1 then
 		local obj = {}
@@ -124,7 +124,7 @@ function Record.update( self, ... )
 		end
 		local k, fn = select(n-1,...)
 		if currentSelf[k] == nil then
-			Record.error(( 'Record doesn\'t have field %q'):format( k ))
+			record.error(( 'Record doesn\'t have field %q'):format( k ))
 		end
 		currentObj[k] = fn(currentSelf[k]) 
 		return obj
@@ -133,16 +133,16 @@ function Record.update( self, ... )
 	end
 end
 
-function Record.update1( self, k, fn )
-	return Record.set1( self, k, fn( self[k] ))
+function record.update1( self, k, fn )
+	return record.set1( self, k, fn( self[k] ))
 end
 
-function Record.update2( self, k1, k2, fn )
-	return Record.set2( self, k1, k2, fn( self[k1][k2] ))
+function record.update2( self, k1, k2, fn )
+	return record.set2( self, k1, k2, fn( self[k1][k2] ))
 end
 
-function Record.update3( self, k1, k2, k3, fn )
-	return Record.set3( self, k1, k2, k3, fn( self[k1][k2][k3] ))
+function record.update3( self, k1, k2, k3, fn )
+	return record.set3( self, k1, k2, k3, fn( self[k1][k2][k3] ))
 end
 
-return Record
+return record
