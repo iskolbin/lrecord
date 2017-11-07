@@ -1,6 +1,6 @@
 --[[
 
-	record - v1.1.0 public domain immutable Records implementaion for Lua. All
+	record - v1.2.0 public domain immutable Records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
@@ -35,7 +35,7 @@ local function make( default, partial )
 	if partial then
 		for k, v in pairs( partial ) do
 			local defaultv = default[k]
-			if type( defaultv ) == 'table' then
+			if v ~= defaultv and type( defaultv ) == 'table' then
 				obj[k] = make( defaultv, v )
 			else
 				obj[k] = v
