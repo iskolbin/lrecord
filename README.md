@@ -4,28 +4,39 @@
 Lua Record
 ==========
 
-Lua helper library for immutable records
+Lua helper library for immutable records.
+
 
 record.make( default, [partial] )
 ---------------------------------
 
 Make new record from specified `default` table. If `partial` is specified then
 override fields with provided values. Default table must be specified. Partial
-table must contain fields which exist in default table
+table must contain fields which exist in default table.
+
 
 record.copy( record )
 ---------------------
 
 Make shallow copy of the `record`. Internally uses `pairs` so it's not very
-efficient for arrays
+efficient for arrays.
+
 
 record.set( record, key1, [key2,key3,...], value )
 --------------------------------------------------
 
-Return new record with changed nested field 
+Return new record with changed nested field, original value must exist.
+
+
+record.put( record, key1, [key2,key3,...], value )
+--------------------------------------------------
+
+Return new record with changed nested field, original value doesn't have to
+be not nil.
+
 
 record.update( record, key1, [key2,key3,...], fn )
 --------------------------------------------------
 
 Return new record with changed nested field which orignal value is passed to
-`fn` function
+`fn` function.
