@@ -1,6 +1,6 @@
 --[[
 
-	record - v1.2.0 public domain immutable Records implementaion for Lua. All
+	record - v1.2.1 public domain immutable Records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
@@ -49,7 +49,7 @@ Record.copy = copy
 
 Record.make = make
 
-local function makesetter( n, updater )
+local function makechanger( n, updater )
 	local loadstring, concat = _G.loadstring or _G.load, table.concat
 	local keys = {}
 	for i = 1, n do keys[i] = 'k' .. i end
@@ -76,32 +76,24 @@ end
 	updater and 'v(o[' .. keys[#keys] .. '])' or 'v'))()
 end
 
-Record.set = setmetatable( {}, {__call = function(self,t,...)
-	local n = select('#',...)-1
-	local f = self[n]
-	if not f then
-		if n >= 1 then
-			f = makesetter( n )
-			self[n] = f
-		else
-			return t
+local function makesetter( updater )
+	return setmetatable( {}, { __call = function( self, t, ... )
+		local n = select( '#', ... )-1
+		local f = self[n]
+		if not f then
+			if n >= 1 then
+				f = makechanger( n, updater )
+				self[n] = f
+			else
+				return t
+			end
 		end
-	end
-	return f(t,...)
-end})
+		return f( t, ... )
+	end })
+end
 
-Record.update = setmetatable( {}, {__call = function(self,t,...)
-	local n = select('#',...)-1
-	local f = self[n]
-	if not f then
-		if n >= 1 then
-			f = makesetter( n, true )
-			self[n] = f
-		else
-			return t
-		end
-	end
-	return f(t,...)
-end})
+Record.set = makesetter( false )
+
+Record.update = makesetter( true )
 
 return Record
