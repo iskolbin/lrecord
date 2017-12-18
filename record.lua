@@ -1,10 +1,10 @@
 --[[
 
-	record - v1.3.1 public domain immutable Records implementaion for Lua. All
+	record - v1.3.2 public domain immutable Records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
-	url: github.com/iskolbin/lRecord
+	url: github.com/iskolbin/lrecord
 	
   COMPATIBLITY
 
