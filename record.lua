@@ -1,6 +1,6 @@
 --[[
 
-	record - v1.2.1 public domain immutable Records implementaion for Lua. All
+	record - v1.3.0 public domain immutable Records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
@@ -49,20 +49,21 @@ Record.copy = copy
 
 Record.make = make
 
-local function makechanger( n, updater )
+local function makechanger( n, updater, allownil )
 	local loadstring, concat = _G.loadstring or _G.load, table.concat
 	local keys = {}
 	for i = 1, n do keys[i] = 'k' .. i end
 	local setters = {}
 	for i = 1, n-1 do
 		setters[i] = ([[
-		c = {}; for k,w in pairs( o[k%d] ) do c[k] = w end; o[k%d] = c; o = o[k%d];]]):format( i, i, i )
+    c = {}; for k,w in pairs( o[k%d] ) do c[k] = w end; o[k%d] = c; o = o[k%d];]]):format( i, i, i )
 	end
 	return loadstring(([[
 local pairs = _G.pairs
 return function( t, %s, v )
-  if t[%s] ~= v then
-		local o, c = {}; for k,w in pairs( t ) do o[k] = w end
+  local oldv = t[%s]%s
+  if oldv ~= v then
+    local o, c = {}; for k,w in pairs( t ) do o[k] = w end
     t = o
 %s
     o[%s] = %s
@@ -71,18 +72,22 @@ return function( t, %s, v )
 end
 ]]):format( concat(keys,', '),
 	concat(keys,']['),
+	allownil and '' or [[ 
+  if oldv == nil then
+    error( "Non existent value for key: ]] .. concat(keys,':') .. [[" )
+  end]], 
 	concat(setters,'\n'),
 	keys[#keys],
 	updater and 'v(o[' .. keys[#keys] .. '])' or 'v'))()
 end
 
-local function makesetter( updater )
+local function makesetter( updater, allownil )
 	return setmetatable( {}, { __call = function( self, t, ... )
 		local n = select( '#', ... )-1
 		local f = self[n]
 		if not f then
 			if n >= 1 then
-				f = makechanger( n, updater )
+				f = makechanger( n, updater, allownil )
 				self[n] = f
 			else
 				return t
@@ -92,8 +97,10 @@ local function makesetter( updater )
 	end })
 end
 
-Record.set = makesetter( false )
+Record.set = makesetter( false, false )
 
-Record.update = makesetter( true )
+Record.update = makesetter( true, false )
+
+Record.put = makesetter( false, true )
 
 return Record

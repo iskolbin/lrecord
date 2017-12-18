@@ -27,6 +27,11 @@ local x = record.make( default )
 assert( equal( x, default ))
 assert( x ~= default )
 
+local ok, _ = pcall( record.set, x, 'a', 5 )
+assert( not ok )
+local ok, _ = pcall( record.put, x, 'a', 5 )
+assert( ok )
+
 assert( equal( record.set( x, 'z', 'a', 'b', 4 ), { x = 1, y = 2, z = { a = { b = 4, z = 4 }}} ))
 assert( equal( record.set( x, 'x', 2 ), { x = 2, y = 2, z = { a = { b = 3, z = 4 }}} ))
 assert( equal( record.set( x, 'z', 'a', {1,2,3}), { x = 1, y = 2, z = { a = {1,2,3}}}))
