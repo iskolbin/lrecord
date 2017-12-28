@@ -1,6 +1,6 @@
 --[[
 
-	record - v1.3.2 public domain immutable Records implementaion for Lua. All
+	record - v1.3.3 public domain immutable Records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
@@ -74,7 +74,7 @@ end
 	concat(keys,']['),
 	allownil and '' or [[ 
   if oldv == nil then
-    error( "Non existent value for key: ]] .. concat(keys,':') .. [[" )
+    error( "Non existent value for key: " .. ]] .. concat(keys,'..":"..') .. [[ )
   end]], 
 	concat(setters,'\n'),
 	keys[#keys],
