@@ -1,6 +1,6 @@
 --[[
 
-	record - v1.3.3 public domain immutable Records implementaion for Lua. All
+	record - v1.4.0 public domain immutable Records implementaion for Lua. All
 	set/update operations yield new lua table with changed contents.
 
 	author: Ilya Kolbin (iskolbin@gmail.com)
@@ -49,14 +49,14 @@ Record.copy = copy
 
 Record.make = make
 
-local function makechanger( n, updater, allownil )
+local function makechanger( n, updater )
 	local loadstring, concat = _G.loadstring or _G.load, table.concat
 	local keys = {}
 	for i = 1, n do keys[i] = 'k' .. i end
 	local setters = {}
 	for i = 1, n-1 do
 		setters[i] = ([[
-    c = {}; for k,w in pairs( o[k%d] ) do c[k] = w end; o[k%d] = c; o = o[k%d];]]):format( i, i, i )
+    c = {}; for k,w in pairs( o[k%d] ) do c[k] = w end; o[k%d] = c; o = c;]]):format( i, i, i )
 	end
 	return loadstring(([[
 local pairs = _G.pairs
@@ -71,8 +71,7 @@ return function( t, %s, v )
   return t
 end
 ]]):format( concat(keys,', '),
-	concat(keys,']['),
-	allownil and '' or [[ 
+	concat(keys,']['),[[
   if oldv == nil then
     error( "Non existent value for key: " .. ]] .. concat(keys,'..":"..') .. [[ )
   end]], 
@@ -81,26 +80,21 @@ end
 	updater and 'v(o[' .. keys[#keys] .. '])' or 'v'))()
 end
 
-local function makesetter( updater, allownil )
-	return setmetatable( {}, { __call = function( self, t, ... )
+local function makesetter( updater )
+	local setters = {[0]=function(t) return t end}
+	return setters, function( t, ... )
 		local n = select( '#', ... )-1
-		local f = self[n]
+		local f = setters[n]
 		if not f then
-			if n >= 1 then
-				f = makechanger( n, updater, allownil )
-				self[n] = f
-			else
-				return t
-			end
+			f = makechanger( n, updater )
+			setters[n] = f
 		end
 		return f( t, ... )
-	end })
+	end
 end
 
-Record.set = makesetter( false, false )
+Record.setters, Record.set = makesetter( false )
 
-Record.update = makesetter( true, false )
-
-Record.put = makesetter( false, true )
+Record.updaters, Record.update = makesetter( true )
 
 return Record
