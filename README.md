@@ -29,13 +29,6 @@ record.set( record, key1, [key2,key3,...], value )
 Return new record with changed nested field, original value must exist.
 
 
-record.put( record, key1, [key2,key3,...], value )
---------------------------------------------------
-
-Return new record with changed nested field, original value doesn't have to
-be not nil.
-
-
 record.update( record, key1, [key2,key3,...], fn )
 --------------------------------------------------
 
