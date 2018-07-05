@@ -39,4 +39,5 @@ assert( record.copy( x ) ~= x )
 assert( equal( record.update( x, 'z', 'a', 'b', tostring ), { x = 1, y = 2, z = {a = { b = '3', z = 4 }}}))
 assert( equal( record.update( x, 'z', function( v ) return v.a.b + 3 end ), { x = 1, y = 2, z = 6 }))
 assert( equal( record.update( x, 'z', 'a', function( v ) return v.b end ), { x = 1, y = 2, z = { a = 3 }} ))
-assert( equal( record.update( x, 'z', 'a', 'b', function( v ) return 'zxy' end ), { x = 1, y = 2, z = { a = { b = 'zxy', z = 4 }}}))
+assert( equal( record.update( x, 'z', 'a', 'b', function( _ ) return 'zxy' end ),
+	{ x = 1, y = 2, z = { a = { b = 'zxy', z = 4 }}}))
